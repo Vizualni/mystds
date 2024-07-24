@@ -1,7 +1,7 @@
 package myptr
 
 // Sometimes implementations want to receive a pointer, and then you have to do this
-// stupid dance to get a pointer to a value.
+// silly dance to get a pointer to a value.
 // value := 42
 // ptr := &value
 // callTheImplementation(ptr)
