@@ -1,6 +1,6 @@
 # MySTDs - My Standard (Library)
 
-[Gopher destroyed by ChatGPT](./docs/images/gopher.webp)
+![Gopher destroyed by ChatGPT](./docs/images/gopher.webp)
 _sorry Go, but ChatGPT couldn't draw you in your original style :(_
 
 
