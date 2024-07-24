@@ -1,5 +1,9 @@
 # MySTDs - My Standard (Library)
 
+[Gopher destroyed by ChatGPT](./docs/images/gopher.webp)
+_sorry Go, but ChatGPT couldn't draw you in your original style :(_
+
+
 Welcome to **mystds**, your new best friend in the world of Go programming! Before you start thinking this is some medical tool for tracking unspeakable infections, let me clarify: **mystds** stands for **My Standard Library**. Yep, you heard it right. It's my personal collection of standard patterns (and anti-patterns) to speed up all my pet projects. 
 You can find: **mychannels**, **mytests**, **myshutdown** for now and many more in near future.
 
