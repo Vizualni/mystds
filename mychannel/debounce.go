@@ -7,32 +7,33 @@ import (
 
 func DebounceAll[T any](ctx context.Context, in <-chan T, delay time.Duration) <-chan []T {
 	ret := make(chan []T)
-	timer := time.NewTimer(delay)
 
 	go func() {
-		defer close(ret)
-
-		defer timer.Stop()
-
-		first, ok, ctxAlive := ReadOne(ctx, in)
-		if !ok || !ctxAlive {
-			return
-		}
-		values := []T{first}
-		timer.Reset(delay)
-	loop:
+		defer Drain(ret)
 		for {
-			select {
-			case <-ctx.Done():
+			first, ok, ctxAlive := ReadOne(ctx, in)
+			if !ok || !ctxAlive {
 				return
-			case <-timer.C:
-				break loop
-			case v := <-in:
-				values = append(values, v)
 			}
-		}
-		if !WriteOne(ctx, ret, values) {
-			return
+			values := []T{first}
+			timer := time.NewTimer(delay)
+			// stopping the timer just in case we exit here because of the context
+			defer timer.Stop()
+		loop:
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-timer.C:
+					break loop
+				case v := <-in:
+					values = append(values, v)
+				}
+			}
+			timer.Stop()
+			if !WriteOne(ctx, ret, values) {
+				return
+			}
 		}
 	}()
 

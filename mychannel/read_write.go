@@ -2,6 +2,7 @@ package mychannel
 
 import "context"
 
+// ReadOne reads one value from the channel while respecting the context.
 func ReadOne[T any](ctx context.Context, in <-chan T) (val T, chOK bool, ctxAlive bool) {
 	var t T
 	select {
@@ -12,6 +13,7 @@ func ReadOne[T any](ctx context.Context, in <-chan T) (val T, chOK bool, ctxAliv
 	}
 }
 
+// WriteOne writes one value to the channel while respecting the context.
 func WriteOne[T any](ctx context.Context, out chan<- T, val T) (ctxAlive bool) {
 	select {
 	case out <- val:

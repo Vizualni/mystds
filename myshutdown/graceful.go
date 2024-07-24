@@ -89,7 +89,7 @@ func TriggerShutdown() {
 	}
 	go func() {
 		wg.Wait()
-		mychannel.DrainAndClose(ch)
+		mychannel.Drain(ch)
 	}()
 
 	timer := time.NewTimer(timeout)
@@ -136,7 +136,7 @@ func RegisterSignals(ctx context.Context, cs ...os.Signal) {
 	_sigch = make(chan os.Signal, 1)
 	signal.Notify(_sigch, cs...)
 	go func() {
-		defer mychannel.DrainAndClose(_sigch)
+		defer mychannel.Drain(_sigch)
 		for range _sigch {
 			log("Received signal, triggering shutdown")
 			ch <- struct{}{}

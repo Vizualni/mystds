@@ -1,11 +1,16 @@
 package mychannel
 
-import "sync"
+import (
+	"context"
+	"sync"
+)
 
 type closechansignal = chan struct{}
 
 type FanInHolder[T any] struct {
 	mu      *sync.RWMutex
+	ctx     context.Context
+	cancel  context.CancelFunc
 	started bool
 	closed  bool
 
@@ -13,15 +18,22 @@ type FanInHolder[T any] struct {
 	out   chan T
 }
 
-func FanIn[T any](chans ...chan T) FanInHolder[T] {
+// FanIn creates a new FanInHolder with the given channels. The standard
+// pattern of using this as a function doesn't work well when you want to add
+// or remove channels. This struct gives you more control over the whole E2E
+// fan-in process.
+func FanIn[T any](ctx context.Context, chans ...chan T) FanInHolder[T] {
 	chansMap := make(map[<-chan T]closechansignal, len(chans))
 	for _, ch := range chans {
 		chansMap[ch] = make(closechansignal)
 	}
+	ctx, cancel := context.WithCancel(ctx)
 	return FanInHolder[T]{
-		mu:    &sync.RWMutex{},
-		chans: chansMap,
-		out:   make(chan T),
+		ctx:    ctx,
+		cancel: cancel,
+		mu:     &sync.RWMutex{},
+		chans:  chansMap,
+		out:    make(chan T),
 	}
 }
 
@@ -39,6 +51,11 @@ func (h *FanInHolder[T]) start() {
 	for ch, iamclosed := range h.chans {
 		h.read(ch, iamclosed)
 	}
+
+	go func() {
+		<-h.ctx.Done()
+		h.Close()
+	}()
 }
 
 func (h *FanInHolder[T]) read(ch <-chan T, iamclosed closechansignal) {
@@ -69,6 +86,7 @@ func (h *FanInHolder[T]) Close() {
 	if h.closed {
 		return
 	}
+	h.cancel()
 	h.closed = true
 	for _, iamclosed := range h.chans {
 		iamclosed <- struct{}{}
@@ -97,6 +115,9 @@ func (h *FanInHolder[T]) Add(ch <-chan T) {
 	defer h.mu.Unlock()
 
 	if h.closed {
+		return
+	}
+	if _, ok := h.chans[ch]; ok {
 		return
 	}
 	h.chans[ch] = make(closechansignal)
