@@ -22,3 +22,20 @@ func WriteOne[T any](ctx context.Context, out chan<- T, val T) (ctxAlive bool) {
 		return false
 	}
 }
+
+func ReadWhile[T any](ctx context.Context, in <-chan T) <-chan T {
+	out := make(chan T, cap(in))
+	go func() {
+		defer close(out)
+
+		for {
+			val, ok, ctxAlive := ReadOne(ctx, in)
+			if !ok || !ctxAlive {
+				return
+			}
+			out <- val
+		}
+	}()
+
+	return out
+}

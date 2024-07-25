@@ -3,6 +3,7 @@ package mychannel
 import (
 	"context"
 	"testing"
+	"time"
 )
 
 func TestReadOne(t *testing.T) {
@@ -108,4 +109,36 @@ func TestWriteOne(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestReadWhile(t *testing.T) {
+	ch := make(chan int)
+	go func() {
+		defer close(ch)
+		ch <- 1
+		ch <- 1
+		ch <- 1
+		ch <- 1
+	}()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	out := ReadWhile(ctx, ch)
+
+	_, ok := <-out
+	if !ok {
+		t.Errorf("expected channel to be open")
+	}
+	cancel()
+	// give some time for the goroutine to close the channel
+	for i := 0; i < 5; i++ {
+		_, ok = <-out
+		if !ok {
+			// good!
+			return
+		}
+
+		time.Sleep(50 * time.Millisecond)
+	}
+
+	t.Fatal("channel should be closed")
 }
