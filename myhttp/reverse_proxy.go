@@ -36,6 +36,9 @@ func (router *ReverseProxyRouter) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	if host == "" {
 		host = r.Header.Get("host")
 	}
+	if host == "" {
+		host = r.Host
+	}
 
 	idx := strings.LastIndex(host, ":")
 	if idx > 0 {
