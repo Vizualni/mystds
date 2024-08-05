@@ -53,4 +53,12 @@ func TestReverseProxy(t *testing.T) {
 	require.Equal(t, h1called, 2)
 	require.Equal(t, h2called, 1)
 	require.Equal(t, defcalled, 1)
+
+	r5, _ := http.NewRequest("GET", "/lala/pero", nil)
+	r5.Header.Set("Host", "ribi.pero.com")
+
+	proxy.ServeHTTP(nil, r5)
+	require.Equal(t, h1called, 2)
+	require.Equal(t, h2called, 2)
+	require.Equal(t, defcalled, 1)
 }

@@ -3,6 +3,7 @@ package myhttp
 import (
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 type reverseProxyData struct {
@@ -32,6 +33,14 @@ func (router *ReverseProxyRouter) Default(handler http.Handler) {
 
 func (router *ReverseProxyRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	host := r.URL.Hostname()
+	if host == "" {
+		host = r.Header.Get("host")
+	}
+
+	idx := strings.LastIndex(host, ":")
+	if idx > 0 {
+		host = host[:idx]
+	}
 
 	for _, route := range router.routes {
 		if route.r.MatchString(host) {
