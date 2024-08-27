@@ -16,7 +16,14 @@ func AlphaNumeric(length int) string {
 	return buildString(AlphabetAlphaNumeric, length)
 }
 
+func Indentifier(length int) string {
+	return buildString(AlphabetLowercase+AlphabetUppercase, 1) + buildString(AlphabetAlphaNumeric, length-1)
+}
+
 func buildString(alphabet string, length int) string {
+	if length <= 0 {
+		return ""
+	}
 	var sb strings.Builder
 
 	for range length {
