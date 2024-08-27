@@ -19,3 +19,14 @@ func MapError[T any, R any](slice []T, fnc func(T) (R, error)) ([]R, error) {
 	}
 	return ret, nil
 }
+
+func Filter[T any](slice []T, fnc func(T) bool) []T {
+	newslice := []T{}
+
+	for _, itm := range slice {
+		if fnc(itm) {
+			newslice = append(newslice, itm)
+		}
+	}
+	return newslice
+}
