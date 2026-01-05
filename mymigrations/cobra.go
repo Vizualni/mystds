@@ -27,10 +27,11 @@ func runMigrations(ctx context.Context, db *sqlx.DB, version int64) error {
 func NewCobraCommand(
 	name string,
 	dialect string,
-	fs fs.FS,
+	readMigrationsFS fs.FS,
+	writeMigrationsDir string,
 	db func() *sqlx.DB,
 ) *cobra.Command {
-	goose.SetBaseFS(fs)
+	goose.SetBaseFS(readMigrationsFS)
 	goose.SetDialect(dialect)
 
 	cmd := &cobra.Command{
@@ -87,7 +88,7 @@ func NewCobraCommand(
 		Long:    "Create new migration file with the name specified in the first argument",
 		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return goose.Create(db().DB, "./", args[0], "sql")
+			return goose.Create(db().DB, "writeMigrationsDir", args[0], "sql")
 		},
 	}
 
