@@ -34,7 +34,7 @@ func NewCobraCommand(
 	goose.SetDialect(dialect)
 
 	cmd := &cobra.Command{
-		Use:   name + "migrations",
+		Use:   name + "-migrations",
 		Short: "Run migrations for " + name,
 	}
 
