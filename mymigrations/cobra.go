@@ -88,7 +88,7 @@ func NewCobraCommand(
 		Long:    "Create new migration file with the name specified in the first argument",
 		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return goose.Create(db().DB, "writeMigrationsDir", args[0], "sql")
+			return goose.Create(db().DB, writeMigrationsDir, args[0], "sql")
 		},
 	}
 
