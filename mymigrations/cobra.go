@@ -12,7 +12,7 @@ import (
 
 const MaxMigrationVersion = int64((1 << 63) - 1)
 
-func runMigrations(ctx context.Context, db *sqlx.DB, version int64) error {
+func RunMigrations(ctx context.Context, db *sqlx.DB, version int64) error {
 	// the default value is the largest possible int64 value.
 	// that is the copy-pasted default value from the goose library.
 	if version == 0 {
@@ -53,7 +53,7 @@ func NewCobraCommand(
 					return err
 				}
 			}
-			return runMigrations(cmd.Context(), db(), upTo)
+			return RunMigrations(cmd.Context(), db(), upTo)
 		},
 	}
 
